@@ -1136,6 +1136,15 @@
                 width: 72px;
                 height: 36px;
             }
+
+
+            .col_recommended_amount
+            {
+                .change_btn
+                {
+                    width: 33.333%;
+                }
+            }
         }
     }
 
