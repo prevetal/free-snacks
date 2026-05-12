@@ -368,6 +368,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	})
 
 
+	// Product to cart
+	$('.product .buy_btn').click(function(e) {
+		e.preventDefault()
+
+		$(this).hide()
+		$(this).next('.after_buy').addClass('show')
+	})
+
+
 	// Product features
 	$('.product .features .spoler_btn').click(function(e) {
 		e.preventDefault()
@@ -482,6 +491,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	$('.filter .reset_btn').click(function() {
 		if (priceRange) { priceRange.reset() }
+	})
+
+
+	// AI help info
+	$('.ai_help_info .product .col_recommended_amount .change_btn').click(function(e) {
+		e.preventDefault()
+
+		const parent = $(this).closest('.col_recommended_amount')
+
+		$(this).hide()
+		parent.find('span').hide()
+		parent.find('.input').fadeIn(100)
 	})
 })
 
