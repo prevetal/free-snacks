@@ -528,7 +528,7 @@ header
 
         margin-left: var(--inner_gap_m);
 
-        z-index: 3;
+        z-index: 5;
 
 
         &.open
@@ -1068,7 +1068,7 @@ header
                 margin-top: var(--inner_gap_xxs);
                 padding-inline: var(--inner_gap) var(--inner_gap_xs);
 
-                z-index: 3;
+                z-index: 5;
 
                 border: 1px solid var(--border_color);
                 border-radius: 10px;
@@ -3963,7 +3963,8 @@ aside
             }
 
 
-            .buy_btn
+            .buy_btn,
+            .after_buy
             {
                 margin-top: 0;
             }
