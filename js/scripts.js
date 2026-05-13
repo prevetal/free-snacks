@@ -516,80 +516,88 @@ function setLastVisible(swiper) {
 var productsSliders = []
 
 function initProductsSliders() {
-	if (WW > 767) {
-		if ($('.products .swiper .grid_row').length) {
-			$('.products .swiper .grid_row > *').addClass('swiper-slide')
-			$('.products .swiper .grid_row').addClass('swiper-wrapper').removeClass('grid_row show')
+	const conditionalSwiper = '.products .swiper:not(.always-swiper)',
+		alwaysSwiper = '.products .swiper.always-swiper'
 
-			$('.products .swiper').each(function (i) {
+	$(alwaysSwiper).each(function (i) {
+		if ($(this).hasClass('products_always_s' + i)) return // уже инициализирован
+
+		$(this).addClass('products_always_s' + i)
+
+		const section = $(this).closest('.products')
+
+		productsSliders.push(new Swiper('.products_always_s' + i, buildProductsOptions(this, section)))
+	})
+
+	if (WW > 767) {
+		if ($(conditionalSwiper + ' .grid_row').length) {
+			$(conditionalSwiper + ' .grid_row > *').addClass('swiper-slide')
+			$(conditionalSwiper + ' .grid_row').addClass('swiper-wrapper').removeClass('grid_row show')
+
+			$(conditionalSwiper).each(function (i) {
 				$(this).addClass('products_s' + i)
 
 				const section = $(this).closest('.products')
 
-				let options = {
-					loop: true,
-					speed: 500,
-					watchSlidesProgress: true,
-					slideActiveClass: 'active',
-					slideVisibleClass: 'visible',
-					lazy: true,
-					navigation: {
-						nextEl: section.find('.swiper-button-next')[0],
-						prevEl: section.find('.swiper-button-prev')[0]
-					},
-					pagination: {
-						el: section.find('.swiper-pagination')[0],
-						type: 'bullets',
-						clickable: true,
-						bulletActiveClass: 'active'
-					},
-					breakpoints: {
-						0: {
-							spaceBetween: getCssVar(this, '--spaceBetween-0'),
-							slidesPerView: getCssVar(this, '--slidesPerView-0'),
-						},
-						1024: {
-							spaceBetween: getCssVar(this, '--spaceBetween-1024'),
-							slidesPerView: getCssVar(this, '--slidesPerView-1024'),
-						},
-						1280: {
-							spaceBetween: getCssVar(this, '--spaceBetween-1280'),
-							slidesPerView: getCssVar(this, '--slidesPerView-1280'),
-						},
-						1440: {
-							spaceBetween: getCssVar(this, '--spaceBetween-1440'),
-							slidesPerView: getCssVar(this, '--slidesPerView-1440'),
-						}
-					},
-					on: {
-						init: swiper => {
-							setHeight(swiper.el.querySelectorAll('.product, .banner'))
-
-							setLastVisible(swiper)
-						},
-						slideChange: swiper => setLastVisible(swiper),
-						resize: swiper => {
-							let items = swiper.el.querySelectorAll('.product, .banner')
-
-							items.forEach(el => el.style.height = 'auto')
-
-							setHeight(items)
-
-							setLastVisible(swiper)
-						}
-					}
-				}
-
-				productsSliders.push(new Swiper('.products_s' + i, options))
+				productsSliders.push(new Swiper('.products_s' + i, buildProductsOptions(this, section)))
 			})
 		}
 	} else {
-		productsSliders.forEach(element => element.destroy(true, true))
+		productsSliders = productsSliders.filter(swiper => {
+			const isAlways = swiper.el.classList.contains('always-swiper')
 
-		productsSliders = []
+			if (!isAlways) swiper.destroy(true, true)
 
-		$('.products .swiper-wrapper').addClass('grid_row show').removeClass('swiper-wrapper')
-		$('.products .swiper .grid_row > *').removeClass('swiper-slide')
-		$('.products .swiper .grid_row .product, .products .swiper .grid_row .banner').height('auto')
+			return isAlways
+		})
+
+		$(conditionalSwiper + ' .swiper-wrapper').addClass('grid_row show').removeClass('swiper-wrapper')
+		$(conditionalSwiper + ' .grid_row > *').removeClass('swiper-slide')
+		$(conditionalSwiper + ' .grid_row .product, ' + conditionalSwiper + ' .grid_row .banner').height('auto')
+	}
+}
+
+
+function buildProductsOptions(el, section) {
+	return {
+		loop: true,
+		speed: 500,
+		watchSlidesProgress: true,
+		slideActiveClass: 'active',
+		slideVisibleClass: 'visible',
+		lazy: true,
+		navigation: {
+			nextEl: section.find('.swiper-button-next')[0],
+			prevEl: section.find('.swiper-button-prev')[0]
+		},
+		pagination: {
+			el: section.find('.swiper-pagination')[0],
+			type: 'bullets',
+			clickable: true,
+			bulletActiveClass: 'active'
+		},
+		breakpoints: {
+			0: { spaceBetween: getCssVar(el, '--spaceBetween-0'), slidesPerView: getCssVar(el, '--slidesPerView-0')    },
+			1024: { spaceBetween: getCssVar(el, '--spaceBetween-1024'), slidesPerView: getCssVar(el, '--slidesPerView-1024') },
+			1280: { spaceBetween: getCssVar(el, '--spaceBetween-1280'), slidesPerView: getCssVar(el, '--slidesPerView-1280') },
+			1440: { spaceBetween: getCssVar(el, '--spaceBetween-1440'), slidesPerView: getCssVar(el, '--slidesPerView-1440') }
+		},
+		on: {
+			init: swiper => {
+				setHeight(swiper.el.querySelectorAll('.product, .banner'))
+
+				setLastVisible(swiper)
+			},
+			slideChange: swiper => setLastVisible(swiper),
+			resize: swiper => {
+				let items = swiper.el.querySelectorAll('.product, .banner')
+
+				items.forEach(el => el.style.height = 'auto')
+
+				setHeight(items)
+
+				setLastVisible(swiper)
+			}
+		}
 	}
 }
