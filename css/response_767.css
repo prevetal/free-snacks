@@ -414,6 +414,45 @@
             }
 
 
+            .grid_row
+            {
+                & > *:nth-child(4n) ~ *
+                {
+                    display: none;
+
+
+                    &.show
+                    {
+                        display: flex;
+                    }
+                }
+
+
+                &:has(.banner) > *:nth-child(5n)
+                {
+                    display: flex;
+                }
+
+
+                &:has(.banner) > *:nth-child(5n) ~ *
+                {
+                    display: none;
+
+
+                    &.show
+                    {
+                        display: flex;
+                    }
+                }
+
+
+                .mob_l_w
+                {
+                    --width_multiplier: 2;
+                }
+            }
+
+
             .swiper-slide
             {
                 width: 200px;
@@ -423,6 +462,7 @@
 
         .banner
         {
+            min-height: 200px;
             padding: var(--inner_gap_s);
 
 
@@ -494,6 +534,12 @@
                 height: 36px;
                 margin-top: var(--inner_gap_s);
             }
+        }
+
+
+        .more_btn
+        {
+            display: block;
         }
     }
 

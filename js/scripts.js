@@ -31,66 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 
-	// Products slider
-	const productsSliders = [],
-		products = document.querySelectorAll('.products .swiper')
-
-	products.forEach((el, i) => {
-		el.classList.add('products_s' + i)
-
-		const section = el.closest('.products')
-
-		let options = {
-			loop: true,
-			speed: 500,
-			watchSlidesProgress: true,
-			slideActiveClass: 'active',
-			slideVisibleClass: 'visible',
-			lazy: true,
-			navigation: {
-				nextEl: section.querySelector('.swiper-button-next'),
-				prevEl: section.querySelector('.swiper-button-prev')
-			},
-			pagination: {
-				el: section.querySelector('.swiper-pagination'),
-				type: 'bullets',
-				clickable: true,
-				bulletActiveClass: 'active'
-			},
-			breakpoints: {
-				0: {
-					spaceBetween: getCssVar(el, '--spaceBetween-0'),
-					slidesPerView: getCssVar(el, '--slidesPerView-0'),
-				},
-				1024: {
-					spaceBetween: getCssVar(el, '--spaceBetween-1024'),
-					slidesPerView: getCssVar(el, '--slidesPerView-1024'),
-				},
-				1280: {
-					spaceBetween: getCssVar(el, '--spaceBetween-1280'),
-					slidesPerView: getCssVar(el, '--slidesPerView-1280'),
-				},
-				1440: {
-					spaceBetween: getCssVar(el, '--spaceBetween-1440'),
-					slidesPerView: getCssVar(el, '--slidesPerView-1440'),
-				}
-			},
-			on: {
-				init: swiper => setHeight(swiper.el.querySelectorAll('.product, .banner')),
-				resize: swiper => {
-					let items = swiper.el.querySelectorAll('.product, .banner')
-
-					items.forEach(el => el.style.height = 'auto')
-
-					setHeight(items)
-				}
-			}
-		}
-
-		productsSliders.push(new Swiper('.products_s' + i, options))
-	})
-
-
 	// Text images slider
 	const textImageSliders = [],
 		textImageSlider = document.querySelectorAll('.text_block .image_slider .swiper')
@@ -504,6 +444,20 @@ document.addEventListener('DOMContentLoaded', function() {
 		parent.find('span').hide()
 		parent.find('.input').fadeIn(100)
 	})
+
+
+	// Products
+	initProductsSliders()
+
+
+	$('.products .more_btn').click(function(e) {
+		e.preventDefault()
+
+		const products = $(this).closest('.products')
+
+		$(this).toggleClass('active')
+		products.find('.grid_row > *').toggleClass('show')
+	})
 })
 
 
@@ -524,6 +478,8 @@ window.addEventListener('resize', function () {
 			$('.products .list').removeClass('show')
 		}
 
+		initProductsSliders()
+
 
 		// Mob. version
 		if (!fakeResize) {
@@ -543,3 +499,97 @@ window.addEventListener('resize', function () {
 		}
 	}
 })
+
+
+function setLastVisible(swiper) {
+    swiper.slides.forEach(slide => slide.classList.remove('last-visible'))
+
+    const last = [...swiper.visibleSlides]
+        .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)
+        .pop()
+
+    if (last) last.classList.add('last-visible')
+}
+
+
+// Products slider
+var productsSliders = []
+
+function initProductsSliders() {
+	if (WW > 767) {
+		if ($('.products .swiper .grid_row').length) {
+			$('.products .swiper .grid_row > *').addClass('swiper-slide')
+			$('.products .swiper .grid_row').addClass('swiper-wrapper').removeClass('grid_row show')
+
+			$('.products .swiper').each(function (i) {
+				$(this).addClass('products_s' + i)
+
+				const section = $(this).closest('.products')
+
+				let options = {
+					loop: true,
+					speed: 500,
+					watchSlidesProgress: true,
+					slideActiveClass: 'active',
+					slideVisibleClass: 'visible',
+					lazy: true,
+					navigation: {
+						nextEl: section.find('.swiper-button-next')[0],
+						prevEl: section.find('.swiper-button-prev')[0]
+					},
+					pagination: {
+						el: section.find('.swiper-pagination')[0],
+						type: 'bullets',
+						clickable: true,
+						bulletActiveClass: 'active'
+					},
+					breakpoints: {
+						0: {
+							spaceBetween: getCssVar(this, '--spaceBetween-0'),
+							slidesPerView: getCssVar(this, '--slidesPerView-0'),
+						},
+						1024: {
+							spaceBetween: getCssVar(this, '--spaceBetween-1024'),
+							slidesPerView: getCssVar(this, '--slidesPerView-1024'),
+						},
+						1280: {
+							spaceBetween: getCssVar(this, '--spaceBetween-1280'),
+							slidesPerView: getCssVar(this, '--slidesPerView-1280'),
+						},
+						1440: {
+							spaceBetween: getCssVar(this, '--spaceBetween-1440'),
+							slidesPerView: getCssVar(this, '--slidesPerView-1440'),
+						}
+					},
+					on: {
+						init: swiper => {
+							setHeight(swiper.el.querySelectorAll('.product, .banner'))
+
+							setLastVisible(swiper)
+						},
+						slideChange: swiper => setLastVisible(swiper),
+						resize: swiper => {
+							let items = swiper.el.querySelectorAll('.product, .banner')
+
+							items.forEach(el => el.style.height = 'auto')
+
+							setHeight(items)
+
+							setLastVisible(swiper)
+						}
+					}
+				}
+
+				productsSliders.push(new Swiper('.products_s' + i, options))
+			})
+		}
+	} else {
+		productsSliders.forEach(element => element.destroy(true, true))
+
+		productsSliders = []
+
+		$('.products .swiper-wrapper').addClass('grid_row show').removeClass('swiper-wrapper')
+		$('.products .swiper .grid_row > *').removeClass('swiper-slide')
+		$('.products .swiper .grid_row .product, .products .swiper .grid_row .banner').height('auto')
+	}
+}
